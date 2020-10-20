@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -20,24 +19,24 @@ namespace AspNetCore3Auth.Infrastructure
         {
             await Task.CompletedTask;
 
-            // В запросе нет cookie с нужным именем
+            // Р’ Р·Р°РїСЂРѕСЃРµ РЅРµС‚ cookie СЃ РЅСѓР¶РЅС‹Рј РёРјРµРЅРµРј
             if (!Request.Cookies.ContainsKey(AppConstants.SimpleCookieAuthenticationSchemeCookieName))
             {
                 return AuthenticateResult.Fail("No cookie found");
             }
 
-            // Получаем из cookie имя пользователя
+            // РџРѕР»СѓС‡Р°РµРј РёР· cookie РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
             var username = Request.Cookies[AppConstants.SimpleCookieAuthenticationSchemeCookieName];
 
-            // Собираем множество утверждений для пользователя
+            // РЎРѕР±РёСЂР°РµРј РјРЅРѕР¶РµСЃС‚РІРѕ СѓС‚РІРµСЂР¶РґРµРЅРёР№ РґР»СЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
             var claims = new List<Claim>
             {
-                // Одно из утверждений по имени пользователя
+                // РћРґРЅРѕ РёР· СѓС‚РІРµСЂР¶РґРµРЅРёР№ РїРѕ РёРјРµРЅРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
                 new Claim(AppConstants.SimpleCookieAuthenticationSchemeUserNameClaimType, username)
             };
 
-            // Имитируем бизнес-логику: если в username значение bob, то добавляем роль
-            // администратора, иначе — обычного пользователя
+            // РРјРёС‚РёСЂСѓРµРј Р±РёР·РЅРµСЃ-Р»РѕРіРёРєСѓ: РµСЃР»Рё РІ username Р·РЅР°С‡РµРЅРёРµ bob, С‚Рѕ РґРѕР±Р°РІР»СЏРµРј СЂРѕР»СЊ
+            // Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°, РёРЅР°С‡Рµ вЂ” РѕР±С‹С‡РЅРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
             if (username == "bob")
             {
                 claims.Add(new Claim(AppConstants.SimpleCookieAuthenticationSchemeRoleClaimType, 
@@ -49,7 +48,7 @@ namespace AspNetCore3Auth.Infrastructure
                     AppConstants.SimpleCookieAuthenticationSchemeUserRole));
             }
 
-            // Подготавливаем authentication ticket
+            // РџРѕРґРіРѕС‚Р°РІР»РёРІР°РµРј authentication ticket
             var identity = new ClaimsIdentity(claims, AppConstants.SimpleCookieAuthenticationScheme);
             var principle = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principle, AppConstants.SimpleCookieAuthenticationScheme);
