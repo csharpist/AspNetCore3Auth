@@ -15,11 +15,21 @@ namespace AspNetCore3Auth
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
             services.AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = AppConstants.SimpleCookieAuthenticationScheme;
                 })
                 .AddScheme<AuthenticationSchemeOptions, SimpleCookieAuthenticationHandler>(AppConstants.SimpleCookieAuthenticationScheme, null);
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(AppConstants.AdminClaimPolicy, policy =>
+                {
+                    policy.RequireClaim(AppConstants.SimpleCookieAuthenticationSchemeRoleClaimType,
+                        AppConstants.SimpleCookieAuthenticationSchemeAdminRole);
+                });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
